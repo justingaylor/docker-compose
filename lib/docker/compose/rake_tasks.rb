@@ -31,9 +31,9 @@ module Docker::Compose
                                                  @net_info.docker_routable_ip)
             self.env.each_pair do |k, v|
               begin
-                puts format('export %s=%s', k, mapper.map(v))
+                puts format('export %s=%s;', k, mapper.map(v))
               rescue Docker::Compose::Mapper::NoService
-                puts format('unset %s # service not running', k)
+                puts format('unset %s; # service not running', k)
               end
             end
           end

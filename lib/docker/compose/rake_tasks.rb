@@ -27,15 +27,19 @@ module Docker::Compose
         namespace :compose do
           desc 'Print bash exports with IP/ports of running containers'
           task :env do
+            commands = []
             mapper = Docker::Compose::Mapper.new(@session,
                                                  @net_info.docker_routable_ip)
             self.env.each_pair do |k, v|
               begin
-                puts format('export %s=%s;', k, mapper.map(v))
+                commands << format('export %s=%s;', k, mapper.map(v))
               rescue Docker::Compose::Mapper::NoService
-                puts format('unset %s; # service not running', k)
+                commands << format('unset %s; # service not running', k)
               end
             end
+            # Ensure that we export first, so that any unset commands do not
+            # unset the variables we are trying to export
+            puts commands.sort.join("\n")
           end
         end
       end
